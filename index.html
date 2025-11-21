@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location-Aware Weather App</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>Weather</h1>
+        <p id="location-status">Detecting location...</p>
+    </header>
+
+    <!-- Main Weather Container -->
+    <main>
+
+        <!-- Weather Icon -->
+        <div id="weather-icon" class="icon-placeholder">
+            <!-- JS will insert icon -->
+        </div>
+
+        <!-- Temperature & Condition -->
+        <div class="temp-section">
+            <h2 id="temperature">--°</h2>
+            <p id="condition">Loading...</p>
+        </div>
+
+        <!-- Weather Stats -->
+        <section class="stats">
+            <div>
+                <p class="label">Humidity</p>
+                <p id="humidity">--%</p>
+            </div>
+            <div>
+                <p class="label">Wind</p>
+                <p id="wind">--</p>
+            </div>
+            <div>
+                <p class="label">Feels Like</p>
+                <p id="feels-like">--°</p>
+            </div>
+        </section>
+
+        <!-- Alerts Button -->
+        <button id="alerts-btn" class="alerts-card">
+            Alerts <span class="arrow">→</span>
+        </button>
+
+    </main>
+
+    <!-- Alert Popup (hidden by default) -->
+    <div id="alert-popup" class="popup hidden">
+        <span class="popup-icon">⚠️</span>
+        <p id="alert-message">Alert message will appear here</p>
+        <button id="close-alert">✖</button>
+    </div>
+
+    <!-- JS -->
+    <script src="assets/js/geolocation.js"></script>
+    <script src="assets/js/weatherApi.js"></script>
+    <script src="assets/js/alerts.js"></script>
+    <script src="assets/js/app.js"></script>
+
+</body>
+
+</html>
