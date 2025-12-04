@@ -1,53 +1,59 @@
-// Geolocation Module
+import { storage } from '../core/storage.js';
+import { showLoading, showError } from '../ui/uiRenderer.js';
+import { weatherAPI } from './weatherApi.js';
 
-export function getUserLocation() {
-    return new Promise((resolve, reject) => {
+// Geolocation module
 
-        // Check if browser supports geolocation
-        if (!navigator.geolocation) {
-            updateLocationStatus("Geolocation not supported.");
-            return reject("Geolocation not supported");
-        }
-
-        // Request location
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const coords = {
-                    lat: position.coords.latitude,
-                    lon: position.coords.longitude
-                };
-
-                updateLocationStatus("Location detected");
-                resolve(coords);
-            },
-
-            (error) => {
-                // Handle common errors
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        updateLocationStatus("Permission denied. Unable to fetch location.");
-                        break;
-
-                    case error.POSITION_UNAVAILABLE:
-                        updateLocationStatus("Position unavailable.");
-                        break;
-
-                    case error.TIMEOUT:
-                        updateLocationStatus("Location request timed out.");
-                        break;
-
-                    default:
-                        updateLocationStatus("Unable to detect location.");
-                }
-
-                reject(error);
+export const geolocation = {
+    getCurrentPosition() {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject(new Error('Geolocation is not supported by your browser'));
+                return;
             }
-        );
-    });
-}
 
-// Update UI
-function updateLocationStatus(message) {
-    const statusEl = document.getElementById("location-status");
-    if (statusEl) statusEl.textContent = message;
-}
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    resolve({ lat: latitude, lon: longitude });
+                },
+                (error) => {
+                    let message = 'Unable to retrieve your location';
+
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            message = 'Location access denied. Please search for a city manually.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            message = 'Location information unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            message = 'Location request timed out.';
+                            break;
+                    }
+
+                    reject(new Error(message));
+                },
+                {
+                    timeout: 10000,
+                    enableHighAccuracy: false
+                }
+            );
+        });
+    },
+
+    async detectAndLoadWeather(saveAsDefault = false) {
+        try {
+            showLoading();
+            const coords = await this.getCurrentPosition();
+
+            if (saveAsDefault) {
+                storage.saveDefaultLocation(coords.lat, coords.lon);
+            }
+
+            await weatherAPI.fetchWeatherByCoords(coords.lat, coords.lon);
+        } catch (error) {
+            showError(error.message);
+        }
+    }
+};
