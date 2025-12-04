@@ -3,7 +3,7 @@
 // ============================
 
 import { getUserLocation } from "./services/geolocation.js";
-import { getWeatherData } from "./weatherAPI.js";
+import { getWeatherData } from "./services/weatherAPI.js";
 
 // UI element references
 const tempEl = document.getElementById("temperature");
