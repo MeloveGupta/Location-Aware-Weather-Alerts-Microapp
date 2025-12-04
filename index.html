@@ -1,56 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location-Aware Weather App</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <meta name="description" content="Beautiful, feature-rich weather application with location detection, search, and smart alerts">
+    <title>Weather App - Your Personal Weather Dashboard</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-
 <body>
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <span class="weather-icon-title">☀️</span>
+                    WeatherNow
+                </h1>
+                
+                <!-- Theme Toggle -->
+                <div class="theme-toggle">
+                    <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle theme">
+                        <span class="theme-icon sun-icon">☀️</span>
+                        <span class="theme-icon moon-icon">🌙</span>
+                    </button>
+                </div>
+            </div>
+        </header>
 
-    <header>
-        <h1>Weather</h1>
-        <p id="location-status">Detecting location...</p>
-    </header>
-    <main>
-        <div id="weather-icon" class="icon-placeholder">
-        </div>
-        <div class="temp-section">
-            <h2 id="temperature">--°</h2>
-            <p id="condition">Loading...</p>
-        </div>
-        <section class="stats">
-            <div>
-                <p class="label">Humidity</p>
-                <p id="humidity">--%</p>
+        <!-- Search Section -->
+        <section class="search-section">
+            <div class="search-container">
+                <div class="search-bar">
+                    <input 
+                        type="text" 
+                        id="citySearch" 
+                        class="search-input" 
+                        placeholder="Search for a city..."
+                        autocomplete="off"
+                    >
+                    <button id="searchBtn" class="search-btn" aria-label="Search">
+                        <span class="search-icon">🔍</span>
+                    </button>
+                </div>
+                
+                <!-- Location Button -->
+                <button id="locationBtn" class="location-btn" aria-label="Use my location">
+                    <span class="location-icon">📍</span>
+                    <span class="location-text">Use My Location</span>
+                </button>
             </div>
-            <div>
-                <p class="label">Wind</p>
-                <p id="wind">--</p>
-            </div>
-            <div>
-                <p class="label">Feels Like</p>
-                <p id="feels-like">--°</p>
+
+            <!-- Recent Searches -->
+            <div id="recentSearches" class="recent-searches">
+                <!-- Recent search chips will be added here dynamically -->
             </div>
         </section>
-        <button id="alerts-btn" class="alerts-card">
-            Alerts <span class="arrow">→</span>
-        </button>
 
-    </main>
-    <div id="alert-popup" class="popup hidden">
-        <span class="popup-icon">⚠️</span>
-        <p id="alert-message">Alert message will appear here</p>
-        <button id="close-alert">✖</button>
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state hidden">
+            <div class="skeleton-card">
+                <div class="skeleton-header"></div>
+                <div class="skeleton-temp"></div>
+                <div class="skeleton-details">
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message hidden">
+            <div class="error-icon">⚠️</div>
+            <p class="error-text"></p>
+            <button id="retryBtn" class="retry-btn">Try Again</button>
+        </div>
+
+        <!-- Weather Dashboard -->
+        <main id="weatherDashboard" class="weather-dashboard hidden">
+            <!-- Location Info -->
+            <div class="location-info">
+                <h2 id="cityName" class="city-name">...</h2>
+                <p id="lastUpdated" class="last-updated">Last updated: ...</p>
+                <button id="refreshBtn" class="refresh-btn" aria-label="Refresh weather">
+                    <span class="refresh-icon">🔄</span>
+                </button>
+            </div>
+
+            <!-- Main Weather Card -->
+            <div class="weather-main-card">
+                <div class="weather-icon-container">
+                    <img id="weatherIcon" src="" alt="Weather icon" class="weather-icon">
+                </div>
+                <div class="weather-main-info">
+                    <div class="temperature-display">
+                        <span id="temperature" class="temperature">--</span>
+                        <span class="temp-unit">°C</span>
+                    </div>
+                    <p id="weatherCondition" class="weather-condition">...</p>
+                    <p id="feelsLike" class="feels-like">Feels like --°C</p>
+                </div>
+            </div>
+
+            <!-- Weather Details Grid -->
+            <div class="weather-details-grid">
+                <div class="detail-card">
+                    <div class="detail-icon">💧</div>
+                    <div class="detail-content">
+                        <p class="detail-label">Humidity</p>
+                        <p id="humidity" class="detail-value">--%</p>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-icon">💨</div>
+                    <div class="detail-content">
+                        <p class="detail-label">Wind Speed</p>
+                        <p id="windSpeed" class="detail-value">-- m/s</p>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-icon">🌡️</div>
+                    <div class="detail-content">
+                        <p class="detail-label">Pressure</p>
+                        <p id="pressure" class="detail-value">-- hPa</p>
+                    </div>
+                </div>
+
+                <div class="detail-card">
+                    <div class="detail-icon">👁️</div>
+                    <div class="detail-content">
+                        <p class="detail-label">Visibility</p>
+                        <p id="visibility" class="detail-value">-- km</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Weather Alerts Section -->
+        <section id="alertsSection" class="alerts-section hidden">
+            <h3 class="alerts-title">⚡ Weather Alerts</h3>
+            <div id="alertsContainer" class="alerts-container">
+                <!-- Alert badges will be added here dynamically -->
+            </div>
+        </section>
+
+        <!-- No Alerts State -->
+        <div id="noAlertsState" class="no-alerts-state hidden">
+            <div class="no-alerts-icon">✅</div>
+            <p class="no-alerts-text">No active alerts at the moment</p>
+            <p class="no-alerts-subtext">Weather conditions are calm</p>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="footer-text">
+                Powered by <a href="https://openweathermap.org/" target="_blank" rel="noopener" class="footer-link">OpenWeatherMap</a>
+            </p>
+        </footer>
     </div>
-    <!-- <script  src="assets/js/geolocation.js"></script> -->
-    <script src="assets/js/weatherApi.js"></script>
-    <script src="assets/js/alerts.js"></script>
+
+    <!-- JavaScript -->
     <script type="module" src="assets/js/app.js"></script>
-
-
 </body>
-
 </html>
