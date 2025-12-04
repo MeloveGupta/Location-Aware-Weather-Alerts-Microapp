@@ -2,7 +2,7 @@
 // APP CONTROLLER
 // ============================
 
-import { getUserLocation } from "./geolocation.js";
+import { getUserLocation } from "./services/geolocation.js";
 import { getWeatherData } from "./weatherAPI.js";
 
 // UI element references
