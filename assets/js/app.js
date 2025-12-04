@@ -1,58 +1,52 @@
-// ============================
-// APP CONTROLLER
-// ============================
+import { storage } from './core/storage.js';
+import { applyTheme } from './ui/theme.js';
+import { renderRecentSearches } from './ui/recentSearches.js';
+import { geolocation } from './services/geolocation.js';
+import { weatherAPI } from './services/weatherApi.js';
+import { showLoading, showError } from './ui/uiRenderer.js';
+import { initEventListeners } from './events/events.js';
 
-import { getUserLocation } from "./geolocation.js";
-import { getWeatherData } from "./weatherAPI.js";
+// Main initialization logic
 
-// UI element references
-const tempEl = document.getElementById("temperature");
-const conditionEl = document.getElementById("condition");
-const humidityEl = document.getElementById("humidity");
-const windEl = document.getElementById("wind");
-const feelsLikeEl = document.getElementById("feels-like");
-const weatherIconEl = document.getElementById("weather-icon");
-const locationStatusEl = document.getElementById("location-status");
+export async function initApp() {
+    // Load and apply saved theme
+    const savedTheme = storage.getTheme();
+    applyTheme(savedTheme);
 
-// RUN APP
-startApp();
+    // Render recent searches
+    renderRecentSearches();
 
-async function startApp() {
-    try {
-        // Step 1: Get coordinates
-        const coords = await getUserLocation();
+    const defaultLocation = storage.getDefaultLocation();
 
-        // Step 2: Fetch weather
-        const weather = await getWeatherData(coords.lat, coords.lon);
+    if (defaultLocation) {
+        await weatherAPI.fetchWeatherByCoords(
+            defaultLocation.lat,
+            defaultLocation.lon
+        );
+    } else {
+        try {
+            showLoading();
+            const coords = await geolocation.getCurrentPosition();
 
-        // Step 3: Update UI
-        updateWeatherUI(weather);
-
-    } catch (error) {
-        console.error("App Error:", error);
+            storage.saveDefaultLocation(coords.lat, coords.lon);
+            await weatherAPI.fetchWeatherByCoords(coords.lat, coords.lon);
+        } catch (error) {
+            showError(
+                error.message +
+                    ' You can search for a city using the search bar above.'
+            );
+        }
     }
 }
 
-// ============================
-// UPDATE UI FUNCTION
-// ============================
+// Bootstrapping – wait for DOM
 
-function updateWeatherUI(weather) {
-    tempEl.textContent = `${weather.temperature}°`;
-    conditionEl.textContent = capitalize(weather.condition);
-    humidityEl.textContent = `${weather.humidity}%`;
-    windEl.textContent = `${weather.wind} km/h`;
-    feelsLikeEl.textContent = `${weather.feelsLike}°`;
-
-    // Add weather icon (OpenWeather icon system)
-    weatherIconEl.innerHTML = `
-        <img src="https://openweathermap.org/img/wn/${weather.icon}@4x.png" alt="Weather Icon">
-    `;
-
-    locationStatusEl.textContent = `Location: ${weather.city}`;
-}
-
-// Helper function to format text
-function capitalize(text) {
-    return text.charAt(0).toUpperCase() + text.slice(1);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        initEventListeners();
+        initApp();
+    });
+} else {
+    initEventListeners();
+    initApp();
 }
